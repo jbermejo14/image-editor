@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.svalero.image_editor.controllers.MainController">
+    <top>
+        <ToolBar>
+            <Button text="Open Image" onAction="#openImage"/>
+            <Button text="Open Multiple Images" onAction="#openImage" />
+            <Button text="Apply Filters" onAction="#applyFilters"/>
+            <Button text="Save Image" onAction="#saveImage"/>
+            <Button text="Add Grayscale Filter" onAction="#addGrayscaleFilter"/>
+            <Button text="Add Invert Filter" onAction="#addInvertFilter"/>
+            <Button text="Add Brightness Filter" onAction="#addBrightnessFilter"/>
+        </ToolBar>
+    </top>
+    <left>
+        <VBox>
+            <Text>Original Image</Text>
+            <ImageView fx:id="originalImageView" fitWidth="300" fitHeight="300" preserveRatio="true"/>
+        </VBox>
+    </left>
+    <right>
+        <VBox>
+            <Text>Processed Image</Text>
+            <ImageView fx:id="processedImageView" fitWidth="300" fitHeight="300" preserveRatio="true"/>
+        </VBox>
+    </right>
+    <center>
+        <ProgressBar fx:id="progressBar" progress="0"/>
+    </center>
+    <bottom>
+        <TextArea fx:id="historyArea" editable="false" wrapText="true" prefHeight="100"/>
+    </bottom>
+</BorderPane>
