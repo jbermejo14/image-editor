@@ -9,9 +9,10 @@
     <top>
         <ToolBar>
             <Button text="Open Image" onAction="#openImage"/>
-            <Button text="Open Multiple Images" onAction="#openImage" />
+            <Button text="Multi-Upload Images" onAction="#openImagesFromDirectory"/>
             <Button text="Apply Filters" onAction="#applyFilters"/>
             <Button text="Save Image" onAction="#saveImage"/>
+            <Button text="Save multiple Images" onAction="#saveImages"/>
             <Button text="Add Grayscale Filter" onAction="#addGrayscaleFilter"/>
             <Button text="Add Invert Filter" onAction="#addInvertFilter"/>
             <Button text="Add Brightness Filter" onAction="#addBrightnessFilter"/>
