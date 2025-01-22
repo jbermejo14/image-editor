@@ -33,24 +33,17 @@ public class ImageProcessingService extends Service<BufferedImage> {
                 }
 
                 BufferedImage image = ImageIO.read(imageFile);
-                System.out.println("Original image size: " + image.getWidth() + "x" + image.getHeight());
 
                 for (ImageFilter filter : filters) {
                     image = filter.apply(image);
-                    System.out.println("Applied filter: " + filter.getClass().getSimpleName());
-                    if (image == null) {
-                        System.out.println("Image became null after applying filter: " + filter.getClass().getSimpleName());
-                    } else {
-                        System.out.println("Processed image size: " + image.getWidth() + "x" + image.getHeight());
-                    }
                 }
 
-                return image; // Return the processed image
+                return image;
             }
         };
     }
 
-    // Method to process multiple images
+    // PROCESA IMAGENE
     public static List<BufferedImage> processImages(List<File> imageFiles, List<ImageFilter> filters) throws InterruptedException {
         List<BufferedImage> processedImages = new ArrayList<>();
         CountDownLatch latch = new CountDownLatch(imageFiles.size());
@@ -63,24 +56,24 @@ public class ImageProcessingService extends Service<BufferedImage> {
             service.setOnSucceeded(event -> {
                 BufferedImage processedImage = service.getValue();
                 if (processedImage != null) {
-                    processedImages.add(processedImage); // Get the processed image
+                    processedImages.add(processedImage);
                     System.out.println("Processed image added: " + file.getName());
                 } else {
                     System.out.println("Processed image is null for: " + file.getName());
                 }
-                latch.countDown(); // Decrement the latch count
+                latch.countDown();
             });
 
             service.setOnFailed(event -> {
                 System.err.println("Error processing image: " + service.getException().getMessage());
-                latch.countDown(); // Decrement the latch count even on failure
+                latch.countDown();
             });
 
-            service.start(); // Start the service
+            service.start();
         }
 
-        latch.await(); // Wait for all services to complete
+        latch.await();
         System.out.println("Total processed images: " + processedImages.size());
-        return processedImages; // Return the list of processed images
+        return processedImages;
     }
 }

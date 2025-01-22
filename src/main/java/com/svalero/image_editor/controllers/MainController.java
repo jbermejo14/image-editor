@@ -40,10 +40,10 @@ public class MainController {
     @FXML
     private ProgressBar progressBar;
 
-    private List<ImageFilter> filters = new ArrayList<>(); // Assuming you have filters defined
-    private ImageHistory history;
-    private ImageProcessingService imageProcessingService;
-    private List<File> imageFiles = new ArrayList<>(); // Class variable to hold image files
+    private final List<ImageFilter> filters;
+    private final ImageHistory history;
+    private final ImageProcessingService imageProcessingService;
+    private final List<File> imageFiles = new ArrayList<>();
 
     public MainController() {
         filters = new ArrayList<>();
@@ -51,51 +51,11 @@ public class MainController {
         imageProcessingService = new ImageProcessingService();
     }
 
-    // This method will be called after the main application is loaded
     public void initialize() {
-        // Perform any necessary setup here
-        System.out.println("MainController initialized.");
-        // You can load default images or set up services here if needed
+        System.out.println("MainController Iniciado.");
     }
 
-    private void saveImagesInBackground(List<BufferedImage> images, File directory) {
-        Service<Void> saveService = new Service<Void>() {
-            @Override
-            protected Task<Void> createTask() {
-                return new Task<Void>() {
-                    @Override
-                    protected Void call() throws Exception {
-                        for (int i = 0; i < images.size(); i++) {
-                            BufferedImage image = images.get(i);
-                            File outputFile = new File(directory, "processed_image_" + (i + 1) + ".png");
-                            ImageIO.write(image, "png", outputFile);
-                        }
-                        return null;
-                    }
-                };
-            }
-        };
-
-        saveService.setOnSucceeded(event -> {
-            // Update UI after saving is complete
-            showCompletionPopup("Images saved successfully!");
-            progressBar.setVisible(false);
-        });
-
-        saveService.setOnFailed(event -> {
-            // Handle any errors that occurred during saving
-            showErrorPopup("Error saving images: " + saveService.getException().getMessage());
-            progressBar.setVisible(false);
-        });
-
-        // Show progress indicator
-        progressBar.setVisible(true);
-        progressBar.setProgress(ProgressIndicator.INDETERMINATE_PROGRESS);
-
-        // Start the service
-        saveService.start();
-    }
-
+//  ABRE 1 IMAGEN
     @FXML
     private void openImage() {
         FileChooser fileChooser = new FileChooser();
@@ -106,6 +66,7 @@ public class MainController {
         }
     }
 
+//  ABRE UNA CARPETA CON IMAGENES
     @FXML
     private void openImagesFromDirectory() {
         DirectoryChooser directoryChooser = new DirectoryChooser();
@@ -116,21 +77,19 @@ public class MainController {
                     name.toLowerCase().endsWith(".jpg") || name.toLowerCase().endsWith(".png"));
 
             if (files != null && files.length > 0) {
-                imageFiles.clear(); // Clear previous files
-                imageFiles.addAll(Arrays.asList(files)); // Add new files to the class-level variable
-                System.out.println("Loaded files: " + imageFiles);
+                imageFiles.clear();
+                imageFiles.addAll(Arrays.asList(files));
 
-                // Create and configure the DirectoryProcessingService
                 DirectoryProcessingService directoryProcessingService = new DirectoryProcessingService();
                 directoryProcessingService.setImageFiles(imageFiles);
-                directoryProcessingService.setFilters(filters); // Assuming filters is a class variable
+                directoryProcessingService.setFilters(filters);
 
-                // Show a progress indicator
+                // BARRA DE PROGRESO
                 progressBar.setVisible(true);
-                progressBar.progressProperty().unbind(); // Unbind previous bindings
+                progressBar.progressProperty().unbind();
                 progressBar.setProgress(ProgressIndicator.INDETERMINATE_PROGRESS);
 
-                // Bind progress bar to the service's progress
+                // UNE LA BARRA DE PROGRESO AL PROCESO
                 progressBar.progressProperty().bind(directoryProcessingService.progressProperty());
 
                 directoryProcessingService.setOnSucceeded(event -> {
@@ -140,51 +99,28 @@ public class MainController {
                     if (processedImages.isEmpty()) {
                         System.out.println("No images selected after processing.");
                         progressBar.setVisible(false);
-                        return; // Exit if no images are processed
+                        return;
                     }
 
-                    // Log details of processed images
-                    for (int i = 0; i < processedImages.size(); i++) {
-                        BufferedImage img = processedImages.get(i);
-                        if (img != null) {
-                            System.out.println("Processed image " + (i + 1) + " size: " + img.getWidth() + "x" + img.getHeight());
-                        } else {
-                            System.out.println("Processed image " + (i + 1) + " is null.");
-                        }
-                    }
-
-                    // Update the UI with the processed images
                     Platform.runLater(() -> {
                         for (BufferedImage processedImage : processedImages) {
-                            if (processedImage != null && processedImage.getWidth() > 0 && processedImage.getHeight() > 0) {
-                                Image fxImage = SwingFXUtils.toFXImage(processedImage, null);
-                                if (originalImageView != null) {
-                                    originalImageView.setImage(fxImage);
-                                } else {
-                                    System.out.println("originalImageView is null.");
-                                }
-                            } else {
-                                System.out.println("Processed image is null or empty.");
-                            }
+                            Image fxImage = SwingFXUtils.toFXImage(processedImage, null);
+                            originalImageView.setImage(fxImage);
                         }
-                        progressBar.setVisible(false); // Hide progress indicator
+                        progressBar.setVisible(false);
                     });
                 });
 
                 directoryProcessingService.setOnFailed(event -> {
                     showErrorPopup("Error processing images: " + directoryProcessingService.getException().getMessage());
-                    progressBar.setVisible(false); // Hide progress indicator
+                    progressBar.setVisible(false);
                 });
-
-                // Start the service
                 directoryProcessingService.start();
             } else {
-                System.out.println("No image files found in the selected directory.");
-                showErrorPopup("No image files found in the selected directory.");
+                showErrorPopup("No hay imagenes en el directorio seleccionado.");
             }
         } else {
-            System.out.println("No directory selected.");
-            showErrorPopup("No directory selected.");
+            showErrorPopup("No hay directorio seleccionado");
         }
     }
 
@@ -199,8 +135,6 @@ public class MainController {
                 showErrorPopup("No hay imágenes para procesar.");
                 return;
             }
-
-            // Run saving task on a separate thread
             ExecutorService executor = Executors.newSingleThreadExecutor();
             executor.submit(() -> {
                 try {
@@ -225,7 +159,7 @@ public class MainController {
                         }
                     }
 
-                    latch.await(); // Wait for all images to be saved
+                    latch.await();
                     Platform.runLater(() -> showCompletionPopup("Todas las imágenes han sido guardadas en: " + selectedDirectory.getAbsolutePath()));
                 } catch (Exception e) {
                     Platform.runLater(() -> showErrorPopup("Error durante el procesamiento de las imágenes: " + e.getMessage()));

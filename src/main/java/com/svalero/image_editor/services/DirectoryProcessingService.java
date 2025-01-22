@@ -36,20 +36,20 @@ public class DirectoryProcessingService extends Service<List<BufferedImage>> {
                     service.setFilters(filters);
 
                     service.setOnSucceeded(event -> {
-                        processedImages.add(service.getValue()); // Get the processed image
-                        latch.countDown(); // Decrement the latch count
+                        processedImages.add(service.getValue());
+                        latch.countDown();
                     });
 
                     service.setOnFailed(event -> {
                         System.err.println("Error processing image: " + service.getException().getMessage());
-                        latch.countDown(); // Decrement the latch count even on failure
+                        latch.countDown();
                     });
 
-                    service.start(); // Start the service
+                    service.start();
                 }
 
-                latch.await(); // Wait for all services to complete
-                return processedImages; // Return the list of processed images
+                latch.await();
+                return processedImages;
             }
         };
     }

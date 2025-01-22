@@ -15,7 +15,7 @@ public class SplashScreen extends Application {
     public void start(Stage splashStage) {
         Label splashLabel = new Label("Cargando Image Editor...");
         ProgressIndicator progressIndicator = new ProgressIndicator();
-        progressIndicator.setProgress(-1); // Indeterminate progress
+        progressIndicator.setProgress(-1);
 
         StackPane splashPane = new StackPane(splashLabel, progressIndicator);
         Scene splashScene = new Scene(splashPane, 400, 200);
@@ -24,25 +24,23 @@ public class SplashScreen extends Application {
         splashStage.setTitle("Cargando...");
         splashStage.show();
 
-        // Simulate loading in a background task
         Task<Void> loadingTask = new Task<>() {
             @Override
             protected Void call() throws Exception {
-                // Simulate loading time (e.g., loading resources, initializing components)
-                Thread.sleep(3000); // Simulate a loading delay
+                Thread.sleep(3000); // CUIDADO AL QUITARLO, FALLA ALGUNA VEZ
                 return null;
             }
         };
 
         loadingTask.setOnSucceeded(event -> {
             try {
-                showMainApplication(splashStage); // Show the main application
+                showMainApplication(splashStage);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
 
-        new Thread(loadingTask).start(); // Start the loading task in a new thread
+        new Thread(loadingTask).start();
     }
 
     private void showMainApplication(Stage primaryStage) throws Exception {
